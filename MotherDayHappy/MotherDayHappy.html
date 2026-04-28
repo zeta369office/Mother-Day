@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mother's Day — For Mom</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Cinzel:wght@400;600&display=swap');
+
+  :root {
+    --blue-primary: #0000ff;
+    --blue-secondary: #2222ff;
+    --blue-glow: rgba(0, 0, 255, 0.6);
+    --blue-faint: rgba(34, 34, 255, 0.15);
+    --bg: #00000a;
+    --card-bg: rgba(0, 0, 60, 0.35);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Cormorant Garamond', serif;
+    cursor: none;
+    user-select: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  #cursor {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 12px; height: 12px;
+    background: var(--blue-primary);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px 4px var(--blue-glow);
+    transition: transform 0.1s ease;
+  }
+
+  /* ── TRAIL HEARTS ── */
+  .trail-heart {
+    position: fixed; pointer-events: none; z-index: 9998;
+    font-size: clamp(10px, 2vw, 18px);
+    color: var(--blue-primary);
+    text-shadow: 0 0 8px var(--blue-glow);
+    animation: trailFade 0.9s ease-out forwards;
+    transform: translate(-50%, -50%);
+  }
+  @keyframes trailFade {
+    0%   { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0;   transform: translate(-50%, -120%) scale(0.3); }
+  }
+
+  /* ── STARFIELD ── */
+  #starfield {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute; background: #fff;
+    border-radius: 50%;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite;
+    opacity: 0;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50%       { opacity: var(--op, 0.6); }
+  }
+
+  /* ── MAIN STAGE ── */
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1;
+    perspective: 900px;
+  }
+
+  /* ── GLOWING POINT ── */
+  #glow-point {
+    position: absolute;
+    width: clamp(14px, 3vw, 22px);
+    height: clamp(14px, 3vw, 22px);
+    background: radial-gradient(circle, #4444ff, #0000ff);
+    border-radius: 50%;
+    box-shadow:
+      0 0 20px 8px rgba(0,0,255,0.8),
+      0 0 50px 20px rgba(0,0,255,0.4),
+      0 0 100px 40px rgba(0,0,255,0.15);
+    animation: pointPulse 2s ease-in-out infinite;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.5s;
+  }
+  @keyframes pointPulse {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 20px 8px rgba(0,0,255,0.8), 0 0 60px 24px rgba(0,0,255,0.3); }
+    50%       { transform: scale(1.3); box-shadow: 0 0 30px 14px rgba(0,0,255,1),   0 0 90px 40px rgba(0,0,255,0.4); }
+  }
+
+  #hint {
+    position: absolute;
+    bottom: calc(50% - clamp(60px,12vw,100px));
+    left: 50%; transform: translateX(-50%);
+    color: rgba(100,100,255,0.7);
+    font-size: clamp(11px, 1.8vw, 14px);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-family: 'Cinzel', serif;
+    animation: hintBlink 2.5s ease-in-out infinite;
+    transition: opacity 0.5s;
+    white-space: nowrap;
+  }
+  @keyframes hintBlink {
+    0%,100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+
+  /* ── HEART PARTICLE CANVAS ── */
+  #heart-canvas {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  /* ── FLOWER WRAPPER ── */
+  #flower-wrap {
+    position: absolute;
+    width: clamp(160px, 30vw, 260px);
+    height: clamp(160px, 30vw, 260px);
+    transform-style: preserve-3d;
+    opacity: 0;
+    z-index: 8;
+  }
+
+  /* ── CARNATION PETALS ── */
+  .layer {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .petal {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform-origin: center bottom;
+    transform-style: preserve-3d;
+    clip-path: polygon(50% 0%,60% 8%,75% 5%,80% 18%,95% 22%,85% 38%,92% 55%,75% 58%,70% 72%,55% 68%,50% 85%,45% 68%,30% 72%,25% 58%,8% 55%,15% 38%,5% 22%,20% 18%,25% 5%,40% 8%);
+    border-radius: 60% 60% 50% 50%;
+    animation: petalBloom 0s ease-out both;
+    backface-visibility: hidden;
+  }
+
+  /* ── ORBIT SYSTEM ── */
+  #orbit-system {
+    position: absolute;
+    width: 1px; height: 1px;
+    transform-style: preserve-3d;
+    opacity: 0;
+    z-index: 6;
+    animation: orbitSpin 20s linear infinite paused;
+  }
+  #orbit-system.running { animation-play-state: running; }
+
+  @keyframes orbitSpin {
+    from { transform: rotateY(0deg) rotateX(20deg); }
+    to   { transform: rotateY(360deg) rotateX(20deg); }
+  }
+
+  .orbit-card {
+    position: absolute;
+    width: clamp(110px, 18vw, 160px);
+    height: clamp(64px, 10vw, 90px);
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 0, 255, 0.45);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+      0 0 18px rgba(0,0,255,0.25),
+      inset 0 0 20px rgba(0,0,255,0.08);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    padding: 10px;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    animation: cardFloat 3s ease-in-out infinite alternate;
+  }
+  .orbit-card:nth-child(2) { animation-delay: -0.6s; }
+  .orbit-card:nth-child(3) { animation-delay: -1.2s; }
+  .orbit-card:nth-child(4) { animation-delay: -1.8s; }
+  .orbit-card:nth-child(5) { animation-delay: -2.4s; }
+
+  @keyframes cardFloat {
+    from { transform: translateZ(0px); }
+    to   { transform: translateZ(12px); }
+  }
+
+  .card-lang {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(7px, 1.2vw, 10px);
+    color: rgba(100,140,255,0.9);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .card-main {
+    font-size: clamp(9px, 1.5vw, 13px);
+    color: #aabbff;
+    text-align: center;
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .card-sub {
+    font-size: clamp(8px, 1.2vw, 11px);
+    color: rgba(120,150,255,0.75);
+    text-align: center;
+  }
+
+  /* ── TITLE OVERLAY ── */
+  #title-overlay {
+    position: fixed;
+    bottom: clamp(24px, 5vh, 48px);
+    left: 50%; transform: translateX(-50%);
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 1.5s ease 1s;
+    pointer-events: none;
+  }
+  #title-overlay.visible { opacity: 1; }
+  #title-overlay h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(14px, 3vw, 22px);
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 20px rgba(0,0,255,0.9), 0 0 40px rgba(0,0,255,0.4);
+  }
+  #title-overlay p {
+    font-size: clamp(10px, 1.6vw, 13px);
+    color: rgba(120,150,255,0.8);
+    letter-spacing: 0.2em;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ── RIPPLE ── */
+  .ripple {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,255,0.5);
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rippleOut 0.8s ease-out forwards;
+  }
+  @keyframes rippleOut {
+    to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="starfield"></div>
+
+<div id="stage">
+  <div id="glow-point"></div>
+  <span id="hint">Tap to Bloom</span>
+  <canvas id="heart-canvas"></canvas>
+  <div id="flower-wrap" style="transform-style:preserve-3d;"></div>
+  <div id="orbit-system"></div>
+</div>
+
+<div id="title-overlay">
+  <h1>HAPPY MOTHER'S DAY</h1>
+  <p>With love, always and forever</p>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STARFIELD
+═══════════════════════════════════════════ */
+(function buildStars() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      top:${Math.random()*100}vh; left:${Math.random()*100}vw;
+      --dur:${2+Math.random()*4}s;
+      --op:${0.3+Math.random()*0.7};
+      animation-delay:${Math.random()*5}s;
+    `;
+    sf.appendChild(s);
+  }
+})();
+
+/* ═══════════════════════════════════════════
+   CURSOR + TRAIL
+═══════════════════════════════════════════ */
+const cursor = document.getElementById('cursor');
+let mx = window.innerWidth/2, my = window.innerHeight/2;
+let lastTrail = 0;
+
+function moveCursor(x, y) {
+  mx = x; my = y;
+  cursor.style.left = x + 'px';
+  cursor.style.top  = y + 'px';
+  spawnTrail(x, y);
+}
+
+document.addEventListener('mousemove', e => moveCursor(e.clientX, e.clientY));
+document.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  moveCursor(t.clientX, t.clientY);
+}, { passive: true });
+
+function spawnTrail(x, y) {
+  const now = Date.now();
+  if (now - lastTrail < 60) return;
+  lastTrail = now;
+  const el = document.createElement('div');
+  el.className = 'trail-heart';
+  el.textContent = '♥';
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  el.style.fontSize = (Math.random() * 10 + 8) + 'px';
+  el.style.opacity = (Math.random() * 0.5 + 0.4).toString();
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+/* ═══════════════════════════════════════════
+   RIPPLE
+═══════════════════════════════════════════ */
+function spawnRipple(x, y) {
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = x + 'px'; r.style.top = y + 'px';
+  r.style.width = '60px'; r.style.height = '60px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 800);
+}
+
+/* ═══════════════════════════════════════════
+   HEART PARTICLE CANVAS
+═══════════════════════════════════════════ */
+const hCanvas  = document.getElementById('heart-canvas');
+const hCtx     = hCanvas.getContext('2d');
+let   hParticles = [];
+let   animating  = false;
+
+function resizeCanvas() {
+  hCanvas.width  = window.innerWidth;
+  hCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function heartX(t, s) { return s * 16 * Math.pow(Math.sin(t), 3); }
+function heartY(t, s) { return -s * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)); }
+
+function buildHeartParticles() {
+  hParticles = [];
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight / 2;
+  const scale = Math.min(window.innerWidth, window.innerHeight) * 0.028;
+  const count = 160;
+  for (let i = 0; i < count; i++) {
+    const t = (i / count) * Math.PI * 2;
+    const tx = cx + heartX(t, scale);
+    const ty = cy + heartY(t, scale);
+    const angle = Math.atan2(ty - cy, tx - cx);
+    const dist  = Math.hypot(tx - cx, ty - cy);
+    hParticles.push({
+      x: cx, y: cy,
+      tx, ty,
+      angle, dist,
+      r: Math.random() * 2 + 1,
+      speed: 0.03 + Math.random() * 0.02,
+      progress: 0,
+      hue: Math.random() * 20,         // 0–20 → blue range
+      alpha: 0.8 + Math.random() * 0.2,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+function drawHeartParticles(ts) {
+  hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
+  let allDone = true;
+  hParticles.forEach(p => {
+    if (p.progress < 1) { p.progress = Math.min(1, p.progress + p.speed); allDone = false; }
+    const ease = 1 - Math.pow(1 - p.progress, 3);
+    p.x = lerp(window.innerWidth/2,  p.tx, ease);
+    p.y = lerp(window.innerHeight/2, p.ty, ease);
+
+    const pulse = 0.7 + 0.3 * Math.sin(ts * 0.002 + p.phase);
+    const glow = hCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+    glow.addColorStop(0, `hsla(${240 + p.hue}, 100%, 65%, ${p.alpha * pulse})`);
+    glow.addColorStop(1, `hsla(${240 + p.hue}, 100%, 50%, 0)`);
+
+    hCtx.beginPath();
+    hCtx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+    hCtx.fillStyle = glow;
+    hCtx.fill();
+
+    hCtx.beginPath();
+    hCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    hCtx.fillStyle = `hsla(${240 + p.hue}, 100%, 75%, ${p.alpha})`;
+    hCtx.fill();
+  });
+  return allDone;
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+/* ═══════════════════════════════════════════
+   3D CARNATION
+═══════════════════════════════════════════ */
+const flowerWrap = document.getElementById('flower-wrap');
+
+const PETAL_CONFIGS = [
+  // [count, radius%, rotX, layerZ, size%, rotY-offset, gradient-start, gradient-end]
+  [12, 28, 55,  0,  42, 0,  '#0000ff','#1111cc'],  // outer
+  [10, 20, 42,  4,  36, 18, '#0011ee','#2222ff'],  // mid-outer
+  [8,  14, 30,  8,  30, 22, '#1122ff','#3333ff'],  // mid
+  [6,  8,  18, 12,  24, 30, '#2233ff','#4455ff'],  // inner
+  [5,  3,   8, 16,  18, 36, '#3344ff','#6677ff'],  // core
+];
+
+function buildCarnation() {
+  flowerWrap.innerHTML = '';
+  const base = parseFloat(getComputedStyle(flowerWrap).width);
+
+  PETAL_CONFIGS.forEach(([count, radPct, rotX, layerZ, sizePct, rotYOff, g1, g2], li) => {
+    const layer = document.createElement('div');
+    layer.className = 'layer';
+    layer.style.transform = `translateZ(${layerZ}px)`;
+    layer.style.transformStyle = 'preserve-3d';
+
+    for (let i = 0; i < count; i++) {
+      const rotY = (360 / count) * i + rotYOff;
+      const rad  = (radPct / 100) * base * 0.5;
+      const size = (sizePct / 100) * base;
+      const p    = document.createElement('div');
+      p.className = 'petal';
+      p.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        margin-left: -${size/2}px;
+        margin-top:  -${size/2}px;
+        background: linear-gradient(135deg, ${g1}, ${g2});
+        box-shadow: 0 0 10px rgba(0,0,255,0.35), inset 0 0 8px rgba(80,80,255,0.2);
+        transform:
+          rotateY(${rotY}deg)
+          translateX(${rad}px)
+          rotateX(${rotX}deg);
+        animation: petalBloom ${0.6 + li * 0.15}s ease-out ${li * 0.12 + 0.3}s both;
+        opacity: 0;
+      `;
+      layer.appendChild(p);
+    }
+    flowerWrap.appendChild(layer);
+  });
+
+  // Center glow orb
+  const orb = document.createElement('div');
+  orb.style.cssText = `
+    position:absolute; left:50%; top:50%;
+    width:22px; height:22px;
+    margin:-11px 0 0 -11px;
+    border-radius:50%;
+    background: radial-gradient(circle, #aabbff, #0000ff);
+    box-shadow: 0 0 20px 8px rgba(0,0,255,0.8);
+    z-index:10;
+    animation: petalBloom 0.4s ease-out 1.2s both;
+    opacity:0;
+  `;
+  flowerWrap.appendChild(orb);
+
+  // inject bloom keyframe
+  if (!document.getElementById('bloom-kf')) {
+    const st = document.createElement('style');
+    st.id = 'bloom-kf';
+    st.textContent = `
+      @keyframes petalBloom {
+        from { opacity:0; transform: rotateY(var(--ry,0deg)) translateX(0) rotateX(0deg) scale(0.1); }
+        to   { opacity:0.92; }
+      }
+      @keyframes flowerSpin {
+        from { transform: rotateY(0deg) rotateX(-10deg); }
+        to   { transform: rotateY(360deg) rotateX(-10deg); }
+      }
+    `;
+    document.head.appendChild(st);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ORBIT CARDS
+═══════════════════════════════════════════ */
+const CARD_DATA = [
+  { lang:'日本語', main:'母の日おめでとう', sub:'ありがとう、お母さん' },
+  { lang:'한국어', main:'어머니의 날 축하해요', sub:'감사합니다, 어머니' },
+  { lang:'繁體中文', main:'母親節快樂', sub:'謝謝妳，媽媽' },
+  { lang:'English', main:'Happy Mother\'s Day', sub:'Thank you, Mom' },
+  { lang:'Indonesia', main:'Selamat Hari Ibu', sub:'Terima kasih, Ibu' },
+];
+
+function buildOrbitCards() {
+  const sys = document.getElementById('orbit-system');
+  sys.innerHTML = '';
+  const orbitR = Math.min(window.innerWidth, window.innerHeight) * 0.36;
+
+  CARD_DATA.forEach((d, i) => {
+    const angle = (360 / CARD_DATA.length) * i;
+    const card  = document.createElement('div');
+    card.className = 'orbit-card';
+    card.innerHTML = `
+      <span class="card-lang">${d.lang}</span>
+      <span class="card-main">${d.main}</span>
+      <span class="card-sub">${d.sub}</span>
+    `;
+    const rad = angle * Math.PI / 180;
+    const x   = Math.cos(rad) * orbitR;
+    const z   = Math.sin(rad) * orbitR;
+    card.style.transform = `
+      rotateY(${-angle}deg)
+      translateX(${x}px)
+      translateZ(${z}px)
+      rotateY(${angle}deg)
+    `;
+    // counter-rotate so cards always face viewer
+    card.style.transform = `rotateY(${angle}deg) translateZ(${orbitR}px) rotateY(0deg)`;
+    sys.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   MAIN ANIMATION LOOP
+═══════════════════════════════════════════ */
+let bloomed = false;
+
+function bloom(trigX, trigY) {
+  if (bloomed) return;
+  bloomed = true;
+
+  spawnRipple(trigX, trigY);
+
+  const gp   = document.getElementById('glow-point');
+  const hint = document.getElementById('hint');
+  gp.style.opacity   = '0';
+  hint.style.opacity = '0';
+  setTimeout(() => { gp.style.display = 'none'; hint.style.display = 'none'; }, 600);
+
+  // Show heart particles
+  buildHeartParticles();
+  hCanvas.style.opacity = '1';
+
+  // Animate loop
+  let heartDone = false;
+  function loop(ts) {
+    if (!heartDone) {
+      heartDone = drawHeartParticles(ts);
+    } else {
+      // Pulse heart particles gently
+      drawHeartParticles(ts);
+    }
+    if (animating) requestAnimationFrame(loop);
+  }
+  animating = true;
+  requestAnimationFrame(loop);
+
+  // Reveal flower
+  buildCarnation();
+  setTimeout(() => {
+    flowerWrap.style.transition = 'opacity 1s ease';
+    flowerWrap.style.opacity = '1';
+    flowerWrap.style.animation = 'flowerSpin 18s linear infinite';
+  }, 400);
+
+  // Reveal orbits
+  buildOrbitCards();
+  setTimeout(() => {
+    const sys = document.getElementById('orbit-system');
+    sys.style.transition = 'opacity 1.5s ease';
+    sys.style.opacity = '1';
+    sys.classList.add('running');
+  }, 1200);
+
+  // Title
+  setTimeout(() => {
+    document.getElementById('title-overlay').classList.add('visible');
+  }, 1800);
+}
+
+/* ═══════════════════════════════════════════
+   TRIGGER LISTENERS
+═══════════════════════════════════════════ */
+const gp = document.getElementById('glow-point');
+gp.addEventListener('click', e => bloom(e.clientX, e.clientY));
+gp.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  bloom(t.clientX, t.clientY);
+}, { passive: true });
+
+// Also allow clicking anywhere to trigger
+document.addEventListener('click', e => {
+  if (!bloomed) bloom(e.clientX, e.clientY);
+});
+document.addEventListener('touchstart', e => {
+  if (!bloomed) { const t = e.touches[0]; bloom(t.clientX, t.clientY); }
+}, { passive: true });
+
+/* ═══════════════════════════════════════════
+   RESIZE HANDLER
+═══════════════════════════════════════════ */
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  if (bloomed) {
+    buildHeartParticles();
+    buildOrbitCards();
+  }
+});
+</script>
+</body>
+</html>
